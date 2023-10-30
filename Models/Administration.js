@@ -2,13 +2,12 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const AdministationSchema = new Schema({
-    name : { type : String, required : true },
-    phone : { type : String, required : true },
-    email : { type : String, required : true },
-    password : { type : String, required : true },
-    isManager : { type : Boolean, required : true },
-    branch_name : { type : String, required : false }, //this is used when the person is a manager not an admin
-    token : { type : String, required : false },
+    Name : { type : String, required : true },
+    Phone : { type : String, required : true },
+    Email : { type : String, required : true },
+    Password : { type : String, required : true },
+    IsManager : { type : Boolean, required : true },
+    Branch_Name : { type : String, required : false }, //this is used when the person is a manager not an admin
 });
 
 module.exports = mongoose.model('Admin', AdministationSchema);
