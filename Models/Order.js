@@ -1,12 +1,15 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+//import the product schema
+const Product = require('./Product');
+
 
 const OrderSchema = new Schema({
     Order_id : { type : String, required : true },
     Customer_Name : { type : String, required : true },
     Customer_Address : { type : String, required : true },
     Customer_Phone : { type : String, required : true },
-    Items : { type : Array, required : true },
+    Items : { type : [Product], required : true },
     Total : { type : Number, required : true },
     GST : { type : Number, required : true },
     Status : { type : String, required : true },

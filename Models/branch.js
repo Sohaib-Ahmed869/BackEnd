@@ -5,3 +5,5 @@ const BranchSchema = new Schema({
     name : { type : String, required : true },
     email : { type : String, required : false },
 });
+
+module.exports = mongoose.model('Branch', BranchSchema);
