@@ -6,7 +6,7 @@ const AdministationSchema = new Schema({
     Phone : { type : String, required : true },
     Email : { type : String, required : true },
     Password : { type : String, required : true },
-    IsManager : { type : Boolean, required : true },
+    Role : { type : String, required : true },
     Branch_Name : { type : String, required : false }, //this is used when the person is a manager not an admin
 });
 

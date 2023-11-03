@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const Category = require('./models/category'); // Assuming you have a Category model defined
+const Category = require('./models/category');
+const auth = require('./Auth');
 
-// GET endpoint
 router.get('/', (req, res) => {
     Category.find({})
     .then(categories => {
@@ -13,8 +13,7 @@ router.get('/', (req, res) => {
     });
 });
 
-// POST endpoint
-router.post('/', (req, res) => {
+router.post('/', auth, (req, res) => {
     const newCategory = new Category(req.body);
     newCategory.save()
     .then(category => {
@@ -25,20 +24,8 @@ router.post('/', (req, res) => {
     });
 });
 
-// DELETE endpoint
-router.delete('/:id', (req, res) => {
+router.delete('/:id', auth, (req, res) => {
     Category.findByIdAndRemove(req.params.id)
-    .then(category => {
-        res.json(category);
-    })
-    .catch(err => {
-        res.status(500).json({ message: err.message });
-    });
-});
-
-// UPDATE endpoint
-router.put('/:id', (req, res) => {
-    Category.findByIdAndUpdate(req.params.id, req.body, {new: true})
     .then(category => {
         res.json(category);
     })

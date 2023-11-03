@@ -3,9 +3,10 @@ const ProductModel = require('../Models/Product');
 const Product = ProductModel.Product;
 const OrderModel = require('../Models/Order');
 const Order = OrderModel.Order;
+const auth = require('../auth');
+const UserAuth = require('../Routes/UserAuth');
 
-
-Router.get('/', (req, res) => {
+Router.get('/', auth, (req, res) => {
 
     Order.find()
     .then((orders) => {
@@ -16,10 +17,16 @@ Router.get('/', (req, res) => {
     });
 });
 
-Router.get('/:id', (req, res) => {
+Router.get('/:id', UserAuth,  (req, res) => {
     Order.findById(req.params.id)
     .then((order) => {
-        res.json(order);
+        //check if order is by the same user
+        if (order.Customer_Phone != req.user.Phone) {
+            res.status(401).json({ message: "Unauthorized" });
+        }
+        else {
+            res.json(order);
+        }
     })
     .catch((err) => {
         res.send(err);
@@ -52,7 +59,7 @@ Router.post('/', (req, res) => {
     });
 });
 
-Router.delete('/:id', (req, res) => {
+Router.delete('/:id', auth, (req, res) => {
     Order.findByIdAndDelete(req.params.id)
     .then((order) => {
         res.json(order);
@@ -62,7 +69,7 @@ Router.delete('/:id', (req, res) => {
     });
 });
 
-Router.put('/:id', (req, res) => {
+Router.put('/:id', auth, (req, res) => {
 
     Order.findByIdAndUpdate(req.params.id, req.body)
     .then((order) => {

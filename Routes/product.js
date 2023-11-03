@@ -22,7 +22,7 @@ Router.get('/:idOrName', (req, res) => {
     });
 });
 
-Router.post ('/', (req, res) => {
+Router.post ('/', auth, (req, res) => {
     const newProduct = new Product({
         Name: req.body.Name,
         Description: req.body.Description,
@@ -41,7 +41,7 @@ Router.post ('/', (req, res) => {
     });
 });
 
-Router.put('/:id', (req, res) => {
+Router.put('/:id', auth, (req, res) => {
     Product.findByIdAndUpdate(req.params.id, req.body)
     .then((product) => {
         res.json(product);
@@ -51,7 +51,7 @@ Router.put('/:id', (req, res) => {
     });
 });
 
-Router.delete('/:id', (req, res) => {
+Router.delete('/:id', auth, (req, res) => {
     Product.findByIdAndDelete(req.params.id)
     .then((product) => {
         res.json(product);
