@@ -1,6 +1,6 @@
 const Router = require('express').Router();
 const { model } = require('mongoose');
-const UserModel = require('../Models/User');
+const UserModel = require('../Models/Customer');
 const mongoose = require('mongoose');
 const jsonwebtoken = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
@@ -8,7 +8,6 @@ const jwt = require('jsonwebtoken');
 const fileUpload = require('express-fileupload');
 const path = require('path');
 const util = require('util');
-const bcrypt = require('bcrypt');
 const UserAuth = require('../Routes/UserAuth');
 const Secret = process.env.SECRET;
 require('dotenv').config();
@@ -126,9 +125,4 @@ Router.post('/login', async (req, res) => {
 
 });
 
-
-
-
-module.exports = router;
-
-model.exports = Router;
+module.exports = Router;

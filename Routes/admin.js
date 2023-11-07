@@ -1,7 +1,7 @@
 const Router = require('express').Router();
 
-const AdminModel = require('../Models/Administrator');
-const auth = require('../auth');
+const AdminModel = require('../Models/Administration');
+const auth = require('./Auth');
 
 const Admin = AdminModel.Admin;
 

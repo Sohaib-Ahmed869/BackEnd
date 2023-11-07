@@ -1,14 +1,11 @@
 require('dotenv').config();
-const express = require('express');
-const { model } = require('mongoose');
-const router = express.Router();
 const jwt = require('jsonwebtoken');
-const Adm = require('../Models/Administrator');
+const Adm = require('../Models/Administration');
 
 
 //make middleware auth
 
-router.use((req, res, next) => {
+const auth = (req, res, next) => {
     if(req.headers.token){
         jwt.verify(req.headers.token, process.env.SECRET, (err, decoded) => {
             if(err){
@@ -25,6 +22,6 @@ router.use((req, res, next) => {
             }
         });
     }
-});
+}
 
-model.exports = router;
+module.exports = auth;

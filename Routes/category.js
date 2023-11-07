@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Category = require('./models/category');
+const Category = require('../Models/Category');
 const auth = require('./Auth');
 
 router.get('/', (req, res) => {

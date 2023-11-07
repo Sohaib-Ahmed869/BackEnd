@@ -9,7 +9,7 @@ const OrderSchema = new Schema({
     Customer_Name : { type : String, required : true },
     Customer_Address : { type : String, required : true },
     Customer_Phone : { type : String, required : true },
-    Items : { type : [Product], required : true },
+    Items : [{ type : Schema.Types.ObjectId, ref : 'Product' }],
     Total : { type : Number, required : true },
     GST : { type : Number, required : true },
     Status : { type : String, required : true },
