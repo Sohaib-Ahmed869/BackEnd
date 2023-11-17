@@ -12,6 +12,7 @@ const ProductSchema = new Schema({
     //make the variations a key value pair of variation name and price
     Variations : { type : Object, required : true },
     Status: { type : String, required : true },
+    Discount: { type: Number, required: true }
 });
 
 module.exports = mongoose.model('Product', ProductSchema);
