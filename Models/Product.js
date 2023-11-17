@@ -11,6 +11,7 @@ const ProductSchema = new Schema({
     Branches_Available : { type : Array, required : true }, //these are the branches where the product is available
     //make the variations a key value pair of variation name and price
     Variations : { type : Object, required : true },
+    Status: { type : String, required : true },
 });
 
 module.exports = mongoose.model('Product', ProductSchema);
