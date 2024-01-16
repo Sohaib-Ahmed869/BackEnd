@@ -9,11 +9,11 @@ mongoose.connect('mongodb://localhost:27017/test', {useNewUrlParser: true, useUn
 .catch(err => console.log(err));
 
 // add routes
-app.use('/admin', require('./routes/admin'));
-app.use('/user', require('./routes/user'));
-app.use('/product', require('./routes/product'));
-app.use('/category', require('./routes/category'));
-app.use('/order', require('./routes/order'));
+app.use('/admin', require('./Routes/admin'));
+app.use('/user', require('./Routes/user'));
+app.use('/product', require('./Routes/product'));
+app.use('/category', require('./Routes/category'));
+app.use('/order', require('./Routes/order'));
 //app.use('/manager', require('./routes/manager'));
 
 app.use((err, req, res, next) => {
