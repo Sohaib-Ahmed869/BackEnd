@@ -3,22 +3,24 @@ const app = express();
 const port = 3000;
 const mongoose = require('mongoose');
 
+const AdminRoutes = require('./Routes/admin');
+
+
+
+
 // Connect to MongoDB
-mongoose.connect('mongodb://localhost:27017/test', {useNewUrlParser: true, useUnifiedTopology: true})
+mongoose.connect('mongodb://127.0.0.1:27017/theWrapSpot')
 .then(() => console.log('Connected to MongoDB'))
 .catch(err => console.log(err));
 
-// add routes
-app.use('/admin', require('./routes/admin'));
-app.use('/user', require('./routes/user'));
-app.use('/product', require('./routes/product'));
-app.use('/category', require('./routes/category'));
-app.use('/order', require('./routes/order'));
-//app.use('/manager', require('./routes/manager'));
+// Middleware
+app.use(express.json());
 
-app.use((err, req, res, next) => {
-    res.status(422).send({error: "No such route found!"});
-});
 
-// Listen to port
-app.listen(port, () => console.log(`Listening to port ${port}`));
+// Import routes
+app.use('/admin', AdminRoutes);
+
+
+
+app.listen(port, () => console.log(`Server running on port ${port}`));
+
