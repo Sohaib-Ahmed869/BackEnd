@@ -1,12 +1,13 @@
 const express = require('express');
 const app = express();
-const port = 3000;
+const port = 5000;
 const mongoose = require('mongoose');
+const cors = require('cors');
+require('dotenv').config();
+
 
 const AdminRoutes = require('./Routes/admin');
-
-
-
+const SuperAdminRoutes = require('./Routes/SuperAdmin');
 
 // Connect to MongoDB
 mongoose.connect('mongodb://127.0.0.1:27017/theWrapSpot')
@@ -15,10 +16,12 @@ mongoose.connect('mongodb://127.0.0.1:27017/theWrapSpot')
 
 // Middleware
 app.use(express.json());
+app.use(cors());
 
 
 // Import routes
 app.use('/admin', AdminRoutes);
+app.use('/superadmin', SuperAdminRoutes);
 
 
 

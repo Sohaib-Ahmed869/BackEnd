@@ -1,8 +1,28 @@
+const multer = require('multer');
 const Router = require('express').Router();
+const jwt = require('jsonwebtoken');
 
 const AdminModel = require('../Models/Administration');
 const BranchModel = require('../Models/branch');
 const ProductModel = require('../Models/Product');
+
+//login admin
+Router.post('/login', async (req, res) => {
+    try {
+        const admin = await AdminModel.findOne({ Email: req.body.Email, Password: req.body.Password });
+        if (admin) {
+            const token = jwt.sign({ Email: admin.Email }, process.env.SECRET);
+            return res.status(200).json({ admin: admin, token: token });
+        }
+        else {
+            return res.status(404).json({ message: 'Wrong Email or Password' });
+        }
+    } catch (err) {
+        return res.status(500).json({ message: err });
+    }
+}
+);
+
 
 //--------------------Admins--------------------
 Router.get('/', async (req, res) => {
@@ -232,6 +252,7 @@ Router.put('/admin/:id', async (req, res) => {
 Router.get('/product', async (req, res) => {
     try {
         const products = await ProductModel.find();
+        console.log(products)
         return res.status(200).json({ products: products });
     } catch (err) {
         return res.status(500).json({ message: err });
@@ -240,20 +261,29 @@ Router.get('/product', async (req, res) => {
 );
 
 Router.post('/product', async (req, res) => {
+    let image;
+    if (req.body.Image) {
+        image = {
+            data: req.body.Image,
+            contentType: 'image/png'
+        };
+    }
+
     const product = new ProductModel({
         Name: req.body.Name,
         Description: req.body.Description,
         Price: req.body.Price,
         Category: req.body.Category,
-        Image: req.body.Image,
         Variations: req.body.Variations,
         Status: req.body.Status,
-        Discount: req.body.Discount
+        Discount: 0,
+        Image: image
     });
     try {
         const savedProduct = await product.save();
         return res.status(200).json({ product: savedProduct });
     } catch (err) {
+        console.log(err);
         return res.status(500).json({ message: err });
     }
 }
@@ -349,16 +379,28 @@ Router.delete('/product/variation/:id', async (req, res) => {
 Router.put('/product/variation/:id', async (req, res) => {
     try {
         const prod = await ProductModel.findOne({ _id: req.params.id });
-        prod.Variations.pull(req.body.Variation);
-        prod.Variations.push(req.body.NewVariation);
-        const updatedProduct = await prod.save();
-        return res.status(200).json({ product: updatedProduct });
-    } catch (err) {
-        return res.status(500).json({ message: err });
-    }
-}
-);
 
+        // Find the index of the old variation in the Variations array
+        const oldVariationIndex = prod.Variations.findIndex(variation => variation.name === req.body.Variation.name);
+
+        if (oldVariationIndex !== -1) {
+            // Delete the old variation
+            prod.Variations.splice(oldVariationIndex, 1);
+
+            // Add the new variation
+            prod.Variations.push(req.body.NewVariation);
+
+            // Save the updated product
+            const updatedProduct = await prod.save();
+
+            return res.status(200).json({ product: updatedProduct, message: 'Variation updated' });
+        } else {
+            return res.status(404).json({ message: 'Old variation not found' });
+        }
+    } catch (err) {
+        return res.status(500).json({ message: err.message });
+    }
+});
 
 
 module.exports = Router;

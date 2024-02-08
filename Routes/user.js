@@ -15,6 +15,7 @@ Router.use(fileUpload());
 
 const User = UserModel.User;
 
+//admin signup and login
 Router.get('/fav/:id', UserAuth, (req, res) => {
     User.findById(req.params.id)
         .then((user) => {
