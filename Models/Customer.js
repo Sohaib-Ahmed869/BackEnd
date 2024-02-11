@@ -6,7 +6,7 @@ const CustomerSchema = new Schema({
     Phone : { type : String, required : true },
     Addresses : { type : Array, required : true },
     Email : { type : String, required : true },
-    Favourite_Products : { type : Array, required : true },
+    Favourite_Products : { type : Array, required : false },
     Status : { type : String, required : true },
 });
 

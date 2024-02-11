@@ -1,6 +1,6 @@
 const Router = require('express').Router();
 const { model } = require('mongoose');
-const UserModel = require('../Models/Customer');
+const User = require('../Models/Customer');
 const mongoose = require('mongoose');
 const jsonwebtoken = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
@@ -13,7 +13,9 @@ const Secret = process.env.SECRET;
 require('dotenv').config();
 Router.use(fileUpload());
 
-const User = UserModel.User;
+
+
+
 
 //admin signup and login
 Router.get('/fav/:id', UserAuth, (req, res) => {
@@ -66,11 +68,11 @@ Router.delete('/fav/:id', UserAuth, (req, res) => {
 Router.post('/register', async (req, res) => {
     try {
 
-        await User.findOne({ Phone: req.body.Phone }, (err, user) => {
-            if (user) {
-                return res.status(400).json({ error: 'User already exists' });
-            }
-        });
+        const checkUser = await User.findOne({ Email: req.body.email });
+        if (checkUser) {
+            return res.status(400).json({ error: 'User already exists' });
+        }
+
 
         const user = new User({
             Name: req.body.name,
@@ -79,6 +81,7 @@ Router.post('/register', async (req, res) => {
             Phone: req.body.phone,
             Address: req.body.address,
             Favourite_Products: [],
+            Status: 'Active'
             //insert image
         });
 
@@ -87,11 +90,11 @@ Router.post('/register', async (req, res) => {
         //generate token
 
         const token = jwt.sign({ Name: user.Name, Password: user.Password }, Secret);
-        res.json({ token });
+        return res.json({ token });
     }
     catch (err) {
         console.log('Error in registration');
-        res.json(err);
+        return res.json(err.message);
 
     }
 });
