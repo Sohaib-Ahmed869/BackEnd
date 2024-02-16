@@ -3,8 +3,8 @@ const ProductModel = require('../Models/Product');
 const Product = ProductModel.Product;
 const OrderModel = require('../Models/Order');
 const Order = OrderModel.Order;
-const auth = require('./Auth');
-const UserAuth = require('../Routes/UserAuth');
+const auth = require('../Middlewares/Auth/auth');
+const UserAuth = require('../Middlewares/Auth/userAuth');
 
 Router.get('/', auth, (req, res) => {
 

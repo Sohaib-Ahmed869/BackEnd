@@ -7,6 +7,7 @@ const CustomerSchema = new Schema({
     Addresses : { type : Array, required : true },
     Email : { type : String, required : true },
     Favourite_Products : { type : Array, required : true },
+    Status : { type : String, required : true },
 });
 
 module.exports = mongoose.model('Customer', CustomerSchema);

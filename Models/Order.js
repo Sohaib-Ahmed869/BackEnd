@@ -12,6 +12,7 @@ const OrderSchema = new Schema({
     Items : [{ type : Schema.Types.ObjectId, ref : 'Product' }],
     Total : { type : Number, required : true },
     GST : { type : Number, required : true },
+    Grand_Total : { type : Number, required : true },
     Status : { type : String, required : true },
     Date : { type : Date, required : true },
     Time : { type : String, required : true },
