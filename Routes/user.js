@@ -1,16 +1,25 @@
 const Router = require('express').Router();
-const { model } = require('mongoose');
 const User = require('../Models/Customer');
-const mongoose = require('mongoose');
 const jsonwebtoken = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const fileUpload = require('express-fileupload');
 const UserAuth = require('../Middlewares/Auth/userAuth');
+const Product = require('../Models/Product');
 const Secret = process.env.SECRET;
 require('dotenv').config();
-Router.use(fileUpload());
 
+
+//=========================================================Product Routes=========================================================
+//get all products
+Router.get('/products', async (req, res) => {
+    try {
+        const products = await Product.find();
+        return res.json(products);
+    } catch (error) {
+        console.error(error.message);
+        return res.status(500).json({ error: 'Server Error' });
+    }
+});
 
 
 
@@ -64,19 +73,19 @@ Router.delete('/fav/:id', UserAuth, (req, res) => {
 
 Router.post('/register', async (req, res) => {
     try {
-
-        const checkUser = await User.findOne({ Email: req.body.email });
+        console.log(req.body);
+        const checkUser = await User.findOne({ Phone: req.body.phone });
         if (checkUser) {
             return res.status(400).json({ error: 'User already exists' });
         }
 
-
+        const pass= await bcrypt.hash(req.body.password, 10);
         const user = new User({
             Name: req.body.name,
-            Password: await bcrypt.hash(req.body.password, 10),
-            Email: req.body.email,
+            Password: pass,
+            // Email: req.body.email,
             Phone: req.body.phone,
-            Address: req.body.address,
+            // Address: req.body.address,
             Favourite_Products: [],
             Status: 'Active'
             //insert image
@@ -84,7 +93,10 @@ Router.post('/register', async (req, res) => {
 
         await user.save();
 
-        const token = jwt.sign({ Name: user.Name, Password: user.Password }, Secret);
+
+        //generate token
+
+        const token = jwt.sign({ Name: user._id, Password: user.Password }, Secret);
         return res.json({ token });
     }
     catch (err) {
@@ -95,8 +107,7 @@ Router.post('/register', async (req, res) => {
 });
 
 Router.post('/login', async (req, res) => {
-    const { Phone, Password } = req.body;
-
+    const { phone: Phone, password } = req.body;
     try {
         const user = await User.findOne({ Phone });
 
@@ -104,22 +115,24 @@ Router.post('/login', async (req, res) => {
             return res.status(400).json({ error: 'User not found' });
         }
 
-        const isMatch = await bcrypt.compare(Password, user.Password);
+        const isMatch = await bcrypt.compare(password, user.Password);
         console.log(isMatch);
         if (!isMatch) {
             return res.status(400).json({ error: 'Invalid credentials' });
         }
 
-        const token = jwt.sign({ id: user._id, name: user.name }, Secret);
+        //generate token
+        const token = jwt.sign({ id: user._id, name: user.Name }, Secret);
         await user.save();
 
-        res.json({ token });
+        return res.json({ token });
 
     } catch (error) {
         console.error(error.message);
-        res.status(400).json({ error: 'Invalid credentials' });
+        return res.status(400).json({ error: 'Invalid credentials' });
     }
 
 });
+
 
 module.exports = Router;

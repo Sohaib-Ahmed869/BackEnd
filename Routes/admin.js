@@ -1,10 +1,10 @@
-const multer = require('multer');
 const Router = require('express').Router();
 const jwt = require('jsonwebtoken');
 
 const AdminModel = require('../Models/Administration');
 const BranchModel = require('../Models/Branch');
 const ProductModel = require('../Models/Product');
+const CustomerModel = require('../Models/Customer');
 
 //login admin
 Router.post('/login', async (req, res) => {
@@ -17,6 +17,29 @@ Router.post('/login', async (req, res) => {
         else {
             return res.status(404).json({ message: 'Wrong Email or Password' });
         }
+    } catch (err) {
+        return res.status(500).json({ message: err });
+    }
+}
+);
+
+//--------------------Customers--------------------
+Router.get('/customer', async (req, res) => {
+    try {
+        const customers = await CustomerModel.find();
+        return res.status(200).json({ customers: customers });
+    } catch (err) {
+        return res.status(500).json({ message: err });
+    }
+}
+);
+
+Router.put('/customer', async (req, res) => {
+    try {
+        const customer = await CustomerModel.findOne({ Email: req.body.Email });
+        customer.Status === 'Active' ? customer.Status = 'Inactive' : customer.Status = 'Active';
+        const updatedCustomer = await customer.save();
+        return res.status(200).json({ customer: updatedCustomer });
     } catch (err) {
         return res.status(500).json({ message: err });
     }
@@ -252,7 +275,6 @@ Router.put('/admin/:id', async (req, res) => {
 Router.get('/product', async (req, res) => {
     try {
         const products = await ProductModel.find();
-        console.log(products)
         return res.status(200).json({ products: products });
     } catch (err) {
         return res.status(500).json({ message: err });
@@ -261,13 +283,16 @@ Router.get('/product', async (req, res) => {
 );
 
 Router.post('/product', async (req, res) => {
-    let image;
-    if (req.body.Image) {
-        image = {
-            data: req.body.Image,
-            contentType: 'image/png'
-        };
-    }
+    console.log('hi this is the product route')
+    console.log(req.files, req.body);
+    const image = req.files.Image;
+    
+
+    const path = image.name;
+
+    await image.mv('./uploads/' + path);
+
+
 
     const product = new ProductModel({
         Name: req.body.Name,
@@ -277,8 +302,10 @@ Router.post('/product', async (req, res) => {
         Variations: req.body.Variations,
         Status: req.body.Status,
         Discount: 0,
-        Image: image
+        Image: path
     });
+
+    console.log(product);
     try {
         const savedProduct = await product.save();
         return res.status(200).json({ product: savedProduct });
@@ -288,20 +315,6 @@ Router.post('/product', async (req, res) => {
     }
 }
 
-);
-
-//update status to active or inactive
-
-Router.put('/product/:id', async (req, res) => {
-    try {
-        const prod = await ProductModel.findOne({ _id: req.params.id });
-        prod.status = req.body.status;
-        const updatedProduct = await prod.save();
-        return res.status(200).json({ product: updatedProduct });
-    } catch (err) {
-        return res.status(500).json({ message: err });
-    }
-}
 );
 
 //update discount
@@ -401,6 +414,20 @@ Router.put('/product/variation/:id', async (req, res) => {
         return res.status(500).json({ message: err.message });
     }
 });
+
+//change status of a product
+Router.put('/product/status/:id', async (req, res) => {
+    try {
+        const prod = await ProductModel.findOne({ _id: req.params.id });
+        const newStatus = prod.Status === 'Available' ? 'Unavailable' : 'Available';
+        prod.Status = newStatus;
+        const updatedProduct = await prod.save();
+        return res.status(200).json({ product: updatedProduct });
+    } catch (err) {
+        return res.status(500).json({ message: err });
+    }
+}
+);
 
 
 module.exports = Router;
