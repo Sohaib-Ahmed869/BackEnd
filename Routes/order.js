@@ -36,7 +36,6 @@ Router.get('/:id', UserAuth,  (req, res) => {
 Router.post('/', (req, res) => {
 
     const newOrder = new Order({
-        Order_Id: req.body.Order_Id,
         Customer_Name: req.body.Customer_Name,
         Customer_Address: req.body.Customer_Address,
         Customer_Phone: req.body.Customer_Phone,

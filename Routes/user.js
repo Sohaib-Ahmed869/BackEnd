@@ -1,18 +1,25 @@
 const Router = require('express').Router();
-const { model } = require('mongoose');
 const User = require('../Models/Customer');
-const mongoose = require('mongoose');
 const jsonwebtoken = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const fileUpload = require('express-fileupload');
-const path = require('path');
-const util = require('util');
 const UserAuth = require('../Routes/UserAuth');
+const Product = require('../Models/Product');
 const Secret = process.env.SECRET;
 require('dotenv').config();
-Router.use(fileUpload());
 
+
+//=========================================================Product Routes=========================================================
+//get all products
+Router.get('/products', async (req, res) => {
+    try {
+        const products = await Product.find();
+        return res.json(products);
+    } catch (error) {
+        console.error(error.message);
+        return res.status(500).json({ error: 'Server Error' });
+    }
+});
 
 
 
@@ -119,14 +126,15 @@ Router.post('/login', async (req, res) => {
         const token = jwt.sign({ id: user._id, name: user.name }, Secret);
         await user.save();
 
-        res.json({ token });
+        return res.json({ token });
 
 
     } catch (error) {
         console.error(error.message);
-        res.status(400).json({ error: 'Invalid credentials' });
+        return res.status(400).json({ error: 'Invalid credentials' });
     }
 
 });
+
 
 module.exports = Router;

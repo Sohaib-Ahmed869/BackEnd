@@ -5,8 +5,7 @@ const Product = require('./Product');
 
 
 const OrderSchema = new Schema({
-    Order_Id : { type : String, required : true },
-    Customer_Name : { type : String, required : true },
+    Customer_Name : { type : String, required : false },
     Customer_Address : { type : String, required : true },
     Customer_Phone : { type : String, required : true },
     Items : [{ type : Schema.Types.ObjectId, ref : 'Product' }],
