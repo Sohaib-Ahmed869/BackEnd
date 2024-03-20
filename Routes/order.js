@@ -5,7 +5,7 @@ const Order = require('../Models/Order');
 const auth = require('../Middlewares/Auth/auth');
 const UserAuth = require('../Middlewares/Auth/userAuth');
 
-Router.get('/', auth, (req, res) => {
+Router.get('/', (req, res) => {
 
     Order.find()
     .then((orders) => {
