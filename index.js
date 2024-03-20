@@ -14,6 +14,7 @@ const CategoryRoutes = require('./Routes/category');
 const CustomerRouters = require('./Routes/user');
 const TaxRouters = require('./Routes/Tax');
 const POS_Order_Routes = require('./Routes/cashier');
+const OrderRoutes = require('./Routes/order');
 const ProductRoutes = require('./Routes/product');
 
 // Connect to MongoDB
@@ -44,6 +45,7 @@ app.use('/tax', TaxRouters);
 app.use('/cashier', POS_Order_Routes);
 app.use('/', CustomerRouters);
 app.use('/products', ProductRoutes);
+app.use('/orders', OrderRoutes);
 
 
 
