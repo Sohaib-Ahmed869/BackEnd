@@ -16,6 +16,7 @@ const CategoryRoutes = require('./Routes/category');
 const CustomerRouters = require('./Routes/user');
 const TaxRouters = require('./Routes/Tax');
 const POS_Order_Routes = require('./Routes/cashier');
+const OrderRoutes = require('./Routes/order');
 const ProductRoutes = require('./Routes/product');
 const SalesRoutes = require('./Routes/adminSales');
 
@@ -70,8 +71,8 @@ app.use('/tax', TaxRouters);
 app.use('/cashier', POS_Order_Routes);
 app.use('/', CustomerRouters);
 app.use('/products', ProductRoutes);
-app.use('/admin', SalesRoutes);
+app.use('/orders', OrderRoutes);
+
 
 
 app.listen(port, () => console.log(`Server running on port ${port}`));
-

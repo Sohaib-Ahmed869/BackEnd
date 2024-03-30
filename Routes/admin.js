@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const admin = require('firebase-admin');
 
 const AdminModel = require('../Models/Administration');
-const BranchModel = require('../Models/branch');
+const BranchModel = require('../Models/Branch');
 const ProductModel = require('../Models/Product');
 const CustomerModel = require('../Models/Customer');
 

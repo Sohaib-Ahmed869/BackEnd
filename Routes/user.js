@@ -3,7 +3,7 @@ const User = require('../Models/Customer');
 const jsonwebtoken = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const UserAuth = require('../Routes/UserAuth');
+const UserAuth = require('../Middlewares/Auth/userAuth');
 const Product = require('../Models/Product');
 const Secret = process.env.SECRET;
 require('dotenv').config();
@@ -55,7 +55,6 @@ Router.post('/fav/:id', UserAuth, (req, res) => {
 Router.delete('/fav/:id', UserAuth, (req, res) => {
     User.findById(req.params.id)
         .then((user) => {
-            //confirm 
             user.Favourite_Products.pull(req.body.Product_Id);
             user.save()
                 .then((user) => {
@@ -127,7 +126,6 @@ Router.post('/login', async (req, res) => {
         await user.save();
 
         return res.json({ token });
-
 
     } catch (error) {
         console.error(error.message);

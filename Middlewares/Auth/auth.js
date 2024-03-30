@@ -1,9 +1,6 @@
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
-const Adm = require('../Models/Administration');
-
-
-//make middleware auth
+const Adm = require('../../Models/Administration');
 
 const auth = (req, res, next) => {
     if (req.headers.token) {
