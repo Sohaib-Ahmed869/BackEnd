@@ -10,7 +10,8 @@ const ProductSchema = new Schema({
     Image : { type : String, required : false },
     Variations : { type : Object},
     Status: { type : String, required : true },
-    Discount: { type: Number }
+    Discount: { type: Number },
+    token: { type: String }
 });
 
 module.exports = mongoose.model('Product', ProductSchema);

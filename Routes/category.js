@@ -16,25 +16,13 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
     const category = new Category({
         Name: req.body.Name,
-        Status: req.body.Status
+        Status: 'Available'
     });
     try {
         const savedCategory = await category.save();
-        return res.status(200).json({ category: savedCategory });
+        return res.status(200).json({ status:200,category: savedCategory });
     } catch (err) {
-        return res.status(500).json({ message: err });
-    }
-}
-);
-
-
-router.put('/:id', async (req, res) => {
-    try {
-        const cat = await Category.findOne({ _id: req.params.id });
-        cat.Name = req.body.Name;
-        const updatedCategory = await cat.save();
-        return res.status(200).json({ category: updatedCategory });
-    } catch (err) {
+        console.log(err);
         return res.status(500).json({ message: err });
     }
 }
@@ -47,7 +35,7 @@ router.put('/', async (req, res) => {
         });
         cat.Status = cat.Status === 'Available' ? 'Unavailable' : 'Available';
         const updatedCategory = await cat.save();
-        return res.status(200).json({ category: updatedCategory });
+        return res.status(200).json({status:200, category: updatedCategory });
     } catch (err) {
         return res.status(500).json({ message: err });
     }

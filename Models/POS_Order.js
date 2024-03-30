@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const POSOrderSchema = new Schema({
     Customer_Name : { type : String, required : false },
-    Items : [{ type : Schema.Types.ObjectId, ref : 'Product' }],
+    Items : { type : Array, required : true },
     Total : { type : Number, required : true },
     GST : { type : Number, required : true },
     Grand_Total : { type : Number, required : true },

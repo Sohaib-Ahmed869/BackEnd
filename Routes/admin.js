@@ -1,23 +1,42 @@
-const multer = require('multer');
 const Router = require('express').Router();
 const jwt = require('jsonwebtoken');
+const admin = require('firebase-admin');
 
 const AdminModel = require('../Models/Administration');
 const BranchModel = require('../Models/branch');
 const ProductModel = require('../Models/Product');
 const CustomerModel = require('../Models/Customer');
 
+const { v4: uuidv4 } = require('uuid');
+
+
+
 //login admin
 Router.post('/login', async (req, res) => {
     try {
-        const admin = await AdminModel.findOne({ Email: req.body.Email, Password: req.body.Password });
+        const admin = await AdminModel.findOne({ name: req.body.Name, password: req.body.Password });
         if (admin) {
-            const token = jwt.sign({ Email: admin.Email }, process.env.SECRET);
-            return res.status(200).json({ admin: admin, token: token });
+            const token = jwt.sign({ _id: admin._id, role: admin.Role, name: admin.Name }, process.env.SECRET);
+            return res.status(200).json({ status: 200, token: token });
         }
-        else {
-            return res.status(404).json({ message: 'Wrong Email or Password' });
-        }
+        return res.status(404).json({ message: 'Invalid credentials' });
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ message: err });
+    }
+}
+);
+
+//signup admin
+Router.post('/signup', async (req, res) => {
+    const admin = new AdminModel({
+        Name: req.body.Name,
+        Password: req.body.Password,
+        Role: 'Admin'
+    });
+    try {
+        const savedAdmin = await admin.save();
+        return res.status(200).json({ admin: savedAdmin });
     } catch (err) {
         return res.status(500).json({ message: err });
     }
@@ -271,51 +290,112 @@ Router.put('/admin/:id', async (req, res) => {
     }
 }
 );
+const getImageDownloadUrl = async (imagePath) => {
+    const firebaseStorage = admin.storage();
+
+    try {
+        // Logic to get the download URL for the image
+        // Example:
+        const downloadUrl = await firebaseStorage.bucket().file(imagePath).getDownloadURL({
+            action: 'read',
+            expires: '01-01-2100'
+        });
+        console.log('Download URL:', downloadUrl[0]);
+
+        return downloadUrl[0];
+    } catch (error) {
+        console.error('Error getting download URL:', error);
+        return null; // or throw error depending on your error handling strategy
+    }
+};
 
 //--------------------Products--------------------
+
+const { Readable } = require('stream');
+
+Router.post('/product', async (req, res) => {
+    console.log('hi this is the product route');
+    console.log(req.files.Image, req.body);
+
+    const { Name, Description, Price, Category, Variations, Status } = req.body;
+    const imageFile = req.files.Image;
+
+    if (!imageFile) {
+        return res.status(400).json({ message: 'Image file is required.' });
+    }
+
+    const bucket = admin.storage().bucket(); // Use already initialized Firebase Admin SDK
+    const fileUpload = bucket.file(`${Name}`);
+
+    // Create a readable stream from the file data buffer
+    const fileStream = new Readable();
+    fileStream.push(imageFile.data);
+    fileStream.push(null); // Signals the end of the stream
+    const uuid = uuidv4();
+
+
+    // Upload image to Firebase Storage
+    fileStream
+        .pipe(
+            fileUpload.createWriteStream({
+                metadata: {
+                    contentType: imageFile.mimetype,
+                    firebaseStorageToken: uuid
+                },
+            })
+        )
+        .on('error', (err) => {
+            console.error('Error uploading image to Firebase Storage:', err);
+            return res.status(500).json({ message: 'Error uploading image.' });
+        })
+        .on('finish', async () => {
+            // Image upload to Firebase Storage is complete
+            const imageUrl = `https://storage.googleapis.com/${bucket.name}/${Name}`;
+
+            // Create new product document
+            const product = new ProductModel({
+                Name,
+                Description,
+                Price,
+                Category,
+                Variations,
+                Status,
+                Discount: 0,
+                Image: imageUrl, // Save image URL instead of file path
+                token: uuid
+            });
+            console.log('product', product);
+
+            try {
+                // Save product to database
+                const savedProduct = await product.save();
+                return res.status(200).json({ status: 200, product: savedProduct });
+            } catch (err) {
+                console.error('Error saving product to database:', err);
+                return res.status(500).json({ message: 'Error saving product to database.' });
+            }
+        });
+});
+
 Router.get('/product', async (req, res) => {
     try {
+        // Fetch all products from the database
         const products = await ProductModel.find();
         return res.status(200).json({ products: products });
     } catch (err) {
         return res.status(500).json({ message: err });
     }
-}
-);
+});
 
-Router.post('/product', async (req, res) => {
-    console.log('hi this is the product route')
-    console.log(req.files, req.body);
-    const image = req.files.Image;
-    
-
-    const path = image.name;
-
-    await image.mv('./uploads/' + path);
-
-
-
-    const product = new ProductModel({
-        Name: req.body.Name,
-        Description: req.body.Description,
-        Price: req.body.Price,
-        Category: req.body.Category,
-        Variations: req.body.Variations,
-        Status: req.body.Status,
-        Discount: 0,
-        Image: path
-    });
-
-    console.log(product);
+Router.get('/product/:id', async (req, res) => {
     try {
-        const savedProduct = await product.save();
-        return res.status(200).json({ product: savedProduct });
+        // Fetch a specific product by ID
+        const product = await ProductModel.findById(req.params.id);
+        return res.status(200).json({ product: product });
     } catch (err) {
-        console.log(err);
         return res.status(500).json({ message: err });
     }
 }
-
 );
 
 //update discount
@@ -336,16 +416,17 @@ Router.put('/discount/product/:id', async (req, res) => {
 );
 
 // update product
-Router.put('/product/update/:id', async (req, res) => {
+Router.put('/product/:id', async (req, res) => {
     try {
         const prod = await ProductModel.findOne({ _id: req.params.id });
         prod.Name = req.body.Name;
         prod.Description = req.body.Description;
         prod.Price = req.body.Price;
-        prod.Category = req.body.Category;
-        prod.Image = req.body.Image;
-        prod.Variations = req.body.Variations;
+        prod.Discount = req.body.Discount;
+
+
         const updatedProduct = await prod.save();
+
         return res.status(200).json({ product: updatedProduct });
     } catch (err) {
         return res.status(500).json({ message: err });
