@@ -6,6 +6,7 @@ const AdminModel = require('../Models/Administration');
 const BranchModel = require('../Models/Branch');
 const ProductModel = require('../Models/Product');
 const CustomerModel = require('../Models/Customer');
+const CashierModel = require('../Models/Cashier');
 
 const { v4: uuidv4 } = require('uuid');
 
@@ -14,7 +15,7 @@ const { v4: uuidv4 } = require('uuid');
 //login admin
 Router.post('/login', async (req, res) => {
     try {
-        const admin = await AdminModel.findOne({ name: req.body.Name, password: req.body.Password });
+        const admin = await AdminModel.findOne({ Name: req.body.Name, Password: req.body.Password });
         if (admin) {
             const token = jwt.sign({ _id: admin._id, role: admin.Role, name: admin.Name }, process.env.SECRET);
             return res.status(200).json({ status: 200, token: token });
@@ -507,6 +508,56 @@ Router.put('/product/status/:id', async (req, res) => {
         return res.status(200).json({ product: updatedProduct });
     } catch (err) {
         return res.status(500).json({ message: err });
+    }
+}
+);
+
+//add cashier 
+Router.post('/cashier', async (req, res) => {
+    try {
+        const cashier = new CashierModel({
+            Name: req.body.Name,
+            Password: req.body.Password,
+            Phone: req.body.Phone,
+            Status: req.body.Status
+        });
+
+        await cashier.save()
+        return res.json({ status: 200, cashier });
+
+    } catch (error) {
+        console.error(error.message);
+        return res.status(500).json({ status: 500, error: 'Server Error' });
+    }
+}
+);
+
+//view all cashiers
+Router.get('/cashiers', async (req, res) => {
+    try {
+        const cashiers = await CashierModel.find();
+        return res.json({status: 200, cashiers: cashiers});
+    } catch (error) {
+        console.error(error.message);
+        return res.status(500).json({ error: 'Server Error' });
+    }
+});
+
+//update cashier status
+Router.put('/cashierStatus/:id', async (req, res) => {
+    try {
+        const cashier = await CashierModel.findById(req.params.id);
+        if (cashier.Status === 'Active') {
+            cashier.Status = 'Inactive';
+        }
+        else if (cashier.Status === 'Inactive') {
+            cashier.Status = 'Active';
+        }
+        const updatedCashier = await cashier.save();
+        return res.status(200).json({ status: 200, cashier: updatedCashier });
+    }
+    catch (err) {
+        return res.status(500).json({ status: 500, message: err });
     }
 }
 );

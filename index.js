@@ -29,7 +29,7 @@ mongoose.connect(process.env.MONGO_URI)
 // Middleware
 app.use(express.json({ limit: '50mb' }));
 app.use(cors({
-    origin: 'http://localhost:3000'
+    origin: '*',
   }));
 
 app.use(fileUpload());
@@ -72,7 +72,7 @@ app.use('/cashier', POS_Order_Routes);
 app.use('/', CustomerRouters);
 app.use('/products', ProductRoutes);
 app.use('/orders', OrderRoutes);
-
+app.use('/sales', SalesRoutes);
 
 
 app.listen(port, () => console.log(`Server running on port ${port}`));
