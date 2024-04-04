@@ -3,7 +3,6 @@ const jwt = require('jsonwebtoken');
 const admin = require('firebase-admin');
 
 const AdminModel = require('../Models/Administration');
-const BranchModel = require('../Models/Branch');
 const ProductModel = require('../Models/Product');
 const CustomerModel = require('../Models/Customer');
 const CashierModel = require('../Models/Cashier');
@@ -125,58 +124,58 @@ Router.put('/:id', async (req, res) => {
 );
 
 
-//--------------------Branches--------------------
-Router.get('/branch', async (req, res) => {
-    try {
-        const branches = await BranchModel.find();
-        return res.status(200).json({ branches: branches });
-    } catch (err) {
-        return res.status(500).json({ message: err });
-    }
-}
-);
+// //--------------------Branches--------------------
+// Router.get('/branch', async (req, res) => {
+//     try {
+//         const branches = await BranchModel.find();
+//         return res.status(200).json({ branches: branches });
+//     } catch (err) {
+//         return res.status(500).json({ message: err });
+//     }
+// }
+// );
 
-Router.post('/branch', async (req, res) => {
-    const branch = new BranchModel({
-        Name: req.body.Name,
-        Email: req.body.Email,
-        Address: req.body.Address,
-        Phone: req.body.Phone
-    });
-    try {
-        const savedBranch = await branch.save();
-        return res.status(200).json({ branch: savedBranch });
-    } catch (err) {
-        return res.status(500).json({ message: err });
-    }
-});
+// Router.post('/branch', async (req, res) => {
+//     const branch = new BranchModel({
+//         Name: req.body.Name,
+//         Email: req.body.Email,
+//         Address: req.body.Address,
+//         Phone: req.body.Phone
+//     });
+//     try {
+//         const savedBranch = await branch.save();
+//         return res.status(200).json({ branch: savedBranch });
+//     } catch (err) {
+//         return res.status(500).json({ message: err });
+//     }
+// });
 
-Router.delete('/branch/:id', async (req, res) => {
-    try {
-        const deletedBranch = await BranchModel.deleteOne({ _id: req.params.id });
-        return res.status(200).json({ branch: deletedBranch });
-    } catch (err) {
-        return res.status(500).json({ message: err });
-    }
-}
-);
+// Router.delete('/branch/:id', async (req, res) => {
+//     try {
+//         const deletedBranch = await BranchModel.deleteOne({ _id: req.params.id });
+//         return res.status(200).json({ branch: deletedBranch });
+//     } catch (err) {
+//         return res.status(500).json({ message: err });
+//     }
+// }
+// );
 
-Router.put('/branch/:id', async (req, res) => {
-    try {
-        const updatedBranch = await BranchModel.updateOne({ _id: req.params.id }, {
-            $set: {
-                Name: req.body.Name,
-                Email: req.body.Email,
-                Address: req.body.Address,
-                Phone: req.body.Phone
-            }
-        });
-        return res.status(200).json({ branch: updatedBranch });
-    } catch (err) {
-        return res.status(500).json({ message: err });
-    }
-}
-);
+// Router.put('/branch/:id', async (req, res) => {
+//     try {
+//         const updatedBranch = await BranchModel.updateOne({ _id: req.params.id }, {
+//             $set: {
+//                 Name: req.body.Name,
+//                 Email: req.body.Email,
+//                 Address: req.body.Address,
+//                 Phone: req.body.Phone
+//             }
+//         });
+//         return res.status(200).json({ branch: updatedBranch });
+//     } catch (err) {
+//         return res.status(500).json({ message: err });
+//     }
+// }
+// );
 
 //--------------------Managers--------------------
 Router.get('/manager', async (req, res) => {
