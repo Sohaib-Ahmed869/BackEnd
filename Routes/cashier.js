@@ -4,6 +4,8 @@ const Product = require("../Models/Product");
 const Cashier = require("../Models/Cashier");
 const ItemModel = require("../Models/Item");
 const Category = require("../Models/Category");
+const { ThermalPrinter, PrinterTypes, CharacterSet, BreakLine } = require('node-thermal-printer');
+
 
 const jwt = require("jsonwebtoken");
 
@@ -217,5 +219,39 @@ Router.patch("/order/:id", async (req, res) => {
     return res.status(500).json({ error: "Server Error" });
   }
 });
+
+//route to print receipt
+Router.post("/print", async (req, res) => {
+  try {
+    const printer = new ThermalPrinter({
+      type: PrinterTypes.EPSON,
+      interface: 'tcp:xxx.xxx.xxx.xxx',
+    });
+
+    printer.alignCenter();
+    printer.println("The Bawarchi Restaurant");
+    printer.println("Receipt");
+    printer.drawLine();
+    printer.alignLeft();
+    printer.table(["Item", "Qty", "Price", "Total"]);
+    printer.drawLine();
+    let total = 0;
+    req.body.Items.map((item) => {
+      printer.table([item.Name, item.quantity, item.Price, item.Price * item.quantity]);
+      total += item.Price * item.quantity;
+    });
+    printer.drawLine();
+    printer.table(["Total", "", "", total]);
+    printer.drawLine();
+    printer.println("Thank you for visiting us!");
+    printer.cut();
+    printer.execute();
+    return res.json({ status: 200 });
+  } catch (error) {
+    console.error(error.message);
+    return res.status(500).json({ error: "Server Error" });
+  }
+}
+);
 
 exports = module.exports = Router;
