@@ -7,10 +7,11 @@ const ProductSchema = new Schema({
     Description : { type : String, required : true },
     Price : { type : Number, required : true },
     Category : { type : String, required : true },
-    Image : { type : String, required : true },
-    Branches_Available : { type : Array, required : true }, //these are the branches where the product is available
-    //make the variations a key value pair of variation name and price
-    Variations : { type : Object, required : true },
+    Image : { type : String, required : false },
+    Variations : { type : Object},
+    Status: { type : String, required : true },
+    Discount: { type: Number },
+    token: { type: String }
 });
 
 module.exports = mongoose.model('Product', ProductSchema);
