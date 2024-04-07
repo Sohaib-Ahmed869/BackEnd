@@ -56,6 +56,7 @@ Router.post("/order", async (req, res) => {
       Payment_Method: req.body.Payment_Method,
       Payment_Done: req.body.Payment_Done,
       Branch_Name: req.body.Branch_Name,
+      Discount: req.body.Discount,
     });
     await order.save();
     return res.json({ order, status: 200 });

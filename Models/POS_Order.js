@@ -19,7 +19,7 @@ const POSOrderSchema = new Schema({
     Date : { type : Date, required : true },
     Payment_Method : { type : String, required : true },
     Payment_Done : { type : Boolean},
-    Discount: {  type : Number, required : true },
+    Discount: { type : Number, required : true },
     Branch_Name : { type : String, required : false }, //this is because we have multiple branches
 });
 
