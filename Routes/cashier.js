@@ -4,8 +4,12 @@ const Product = require("../Models/Product");
 const Cashier = require("../Models/Cashier");
 const ItemModel = require("../Models/Item");
 const Category = require("../Models/Category");
-const { ThermalPrinter, PrinterTypes, CharacterSet, BreakLine } = require('node-thermal-printer');
-
+const {
+  ThermalPrinter,
+  PrinterTypes,
+  CharacterSet,
+  BreakLine,
+} = require("node-thermal-printer");
 
 const jwt = require("jsonwebtoken");
 
@@ -208,6 +212,23 @@ Router.put("/refund", async (req, res) => {
   }
 });
 
+Router.patch("/order/additem/:id", async (req, res) => {
+  try {
+    const order = await POS_Order.findById(req.params.id);
+    const item = new ItemModel({
+      Name: req.body.Name,
+      Price: req.body.Price,
+      quantity: req.body.quantity,
+    });
+    order.Items.push(item);
+    await order.save();
+    return res.json(order);
+  } catch (error) {
+    console.error(error.message);
+    return res.status(500).json({ error: "Server Error" });
+  }
+});
+
 Router.patch("/order/:id", async (req, res) => {
   try {
     const order = await POS_Order.findById(req.params.id);
@@ -221,33 +242,16 @@ Router.patch("/order/:id", async (req, res) => {
   }
 });
 
-//route to print receipt
-Router.post("/print", async (req, res) => {
+Router.patch("/orderPrice/:id", async (req, res) => {
   try {
-    const printer = new ThermalPrinter({
-      type: PrinterTypes.EPSON,
-      interface: 'tcp:xxx.xxx.xxx.xxx',
-    });
-
-    printer.alignCenter();
-    printer.println("The Bawarchi Restaurant");
-    printer.println("Receipt");
-    printer.drawLine();
-    printer.alignLeft();
-    printer.table(["Item", "Qty", "Price", "Total"]);
-    printer.drawLine();
-    let total = 0;
-    req.body.Items.map((item) => {
-      printer.table([item.Name, item.quantity, item.Price, item.Price * item.quantity]);
-      total += item.Price * item.quantity;
-    });
-    printer.drawLine();
-    printer.table(["Total", "", "", total]);
-    printer.drawLine();
-    printer.println("Thank you for visiting us!");
-    printer.cut();
-    printer.execute();
-    return res.json({ status: 200 });
+    const order = await POS_Order.findById(req.params.id);
+    const Grand_Total = parseInt(req.body.Grand_Total);
+    const itemPrice = parseInt(req.body.itemPrice);
+    console.log(Grand_Total, itemPrice);
+    order.Grand_Total = Grand_Total + itemPrice;
+    order.Total = Grand_Total + itemPrice;
+    await order.save();
+    return res.json(order);
   } catch (error) {
     console.error(error.message);
     return res.status(500).json({ error: "Server Error" });
@@ -255,4 +259,14 @@ Router.post("/print", async (req, res) => {
 }
 );
 
+Router.get('/orderPrice/:id', async (req, res) => {
+  try {
+    const order = await POS_Order.findById(req.params.id);
+    return res.json(order.Grand_Total);
+  } catch (error) {
+    console.error(error.message);
+    return res.status(500).json({ error: "Server Error" });
+  }
+}
+);
 exports = module.exports = Router;
