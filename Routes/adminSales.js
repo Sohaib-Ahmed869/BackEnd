@@ -11,7 +11,6 @@ const Secret = process.env.SECRET;
 //get all orders
 Router.get("/orders", async (req, res) => {
   try {
-    console.log("here");
     const orders = await POS_Order.find();
     return res.json(orders);
   } catch (error) {
@@ -40,18 +39,27 @@ Router.get("/sales/:date", async (req, res) => {
     let total = 0;
     let cardTotal = 0;
     let cashTotal = 0;
+    let foodPanda = 0;
+    let takeAway = 0;
     orders.forEach((order) => {
       total += order.Total;
       if (order.Payment_Method === "Card") {
         cardTotal += order.Total;
       } else if (order.Payment_Method === "Cash") {
         cashTotal += order.Total;
+      } else if (order.Payment_Method === "Foodpanda") {
+        foodPanda += order.Total;
+      } else if (order.Payment_Method === "TakeAway") {
+        takeAway += order.Total;
       }
+
     });
     return res.json({
       Total: total,
       Card: cardTotal,
       Cash: cashTotal,
+      Foodpanda: foodPanda,
+      TakeAway: takeAway,
       Number_of_Orders: number_of_orders,
     });
   } catch (error) {
@@ -81,17 +89,25 @@ Router.get("/sales/month/:month", async (req, res) => {
     let number_of_orders = filteredOrders.length;
     let cardTotal = 0;
     let cashTotal = 0;
+    let foodPanda = 0;
+    let takeAway = 0;
     filteredOrders.forEach((order) => {
       if (order.Payment_Method === "Card") {
         cardTotal += order.Total;
       } else if (order.Payment_Method === "Cash") {
         cashTotal += order.Total;
+      } else if (order.Payment_Method === "Foodpanda") {
+        foodPanda += order.Total;
+      } else if (order.Payment_Method === "TakeAway") {
+        takeAway += order.Total;
       }
     });
     return res.json({
       Total: total,
       Card: cardTotal,
       Cash: cashTotal,
+      Foodpanda: foodPanda,
+      TakeAway: takeAway,
       Number_of_Orders: number_of_orders,
     });
   } catch (error) {
@@ -121,17 +137,26 @@ Router.get("/sales/year/:year", async (req, res) => {
     let number_of_orders = filteredOrders.length;
     let cardTotal = 0;
     let cashTotal = 0;
+    let foodPanda = 0;
+    let takeAway = 0;
     filteredOrders.forEach((order) => {
       if (order.Payment_Method === "Card") {
         cardTotal += order.Total;
       } else if (order.Payment_Method === "Cash") {
         cashTotal += order.Total;
+      } else if (order.Payment_Method === "Foodpanda") {
+        foodPanda += order.Total;
+      } else if (order.Payment_Method === "TakeAway") {
+        takeAway += order.Total;
       }
+
     });
     return res.json({
       Total: total,
       Card: cardTotal,
       Cash: cashTotal,
+      Foodpanda: foodPanda,
+      TakeAway: takeAway,
       Number_of_Orders: number_of_orders,
     });
   } catch (error) {
@@ -195,7 +220,6 @@ const getMostSoldProductbyDate = async (date) => {
       });
     }
 
-    console.log(sortedItems);
     //sort the items by quantity
     sortedItems.sort((a, b) => {
       return b.quantity - a.quantity;
@@ -308,14 +332,12 @@ Router.get("/mostsold/month/:month", async (req, res) => {
 
 // Function to calculate most sold products of all time
 const getMostSoldProduct = async () => {
-    console.log("here")
   try {
     let orders = await POS_Order.find();
     //filter the orders so that they are only the ones with delivered and completed status
     orders = orders.filter((order) => {
         return order.Status === "Completed";
     });
-    console.log(orders);
     
     if (orders.length === 0) {
       return null;
@@ -370,7 +392,6 @@ const getMostSoldProduct = async () => {
 Router.get("/mostsold", async (req, res) => {
   try {
     const result = await getMostSoldProduct();
-    console.log(result);
     if (!result) {
       return res.status(404).json({ error: "No data found" });
     }
