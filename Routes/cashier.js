@@ -270,4 +270,19 @@ Router.get('/orderPrice/:id', async (req, res) => {
   }
 }
 );
+
+//update order payment method
+Router.patch("/orderPaymentMethod/:id", async (req, res) => {
+  try {
+    const order = await POS_Order.findById(req.params.id);
+    const Payment_Method = req.body.Payment_Method;
+    order.Payment_Method = Payment_Method;
+    await order.save();
+    return res.json(order);
+  } catch (error) {
+    console.error(error.message);
+    return res.status(500).json({ error: "Server Error" });
+  }
+});
+
 exports = module.exports = Router;
