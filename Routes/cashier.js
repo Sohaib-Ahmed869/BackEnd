@@ -247,9 +247,10 @@ Router.patch("/orderPrice/:id", async (req, res) => {
     const order = await POS_Order.findById(req.params.id);
     const Grand_Total = parseInt(req.body.Grand_Total);
     const itemPrice = parseInt(req.body.itemPrice);
+    const quantity = parseInt(req.body.quantity);
     console.log(Grand_Total, itemPrice);
-    order.Grand_Total = Grand_Total + itemPrice;
-    order.Total = Grand_Total + itemPrice;
+    order.Grand_Total = Grand_Total + (itemPrice*quantity);
+    order.Total = Grand_Total + (itemPrice*quantity);
     await order.save();
     return res.json(order);
   } catch (error) {
